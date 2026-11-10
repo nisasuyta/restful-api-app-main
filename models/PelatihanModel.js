@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
-const alamatSchema = new mongoose.Schema({
-  jalan: String,
-  kota: String,
+const jadwalSchema = new mongoose.Schema({
+  mulai: { type: String },
+  selesai: { type: String },
 }, { _id: false });
 
 const PelatihanSchema = new mongoose.Schema({

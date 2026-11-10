@@ -1,11 +1,11 @@
-const Mahasiswa = require('../models/mahasiswaModel');
-const Prodi = require('../models/prodiModel');
+const Pelatihan = require('../models/PelatihanModel'); //model utama
+const Lembaga = require('../models/LembagaModel'); // model pendukung 
 const { errorHttp } = require('../middlewares/errorHandler');
 
 const LIMIT_DEFAULT = 10;
 const LIMIT_MAKS = 50;
-const FIELD_SORT = ['nama', 'nim', 'createdAt'];
-const FIELD_BOLEH_DIPILIH = ['nama', 'nim', 'alamat', 'prodiId', 'createdAt'];
+const FIELD_SORT = ['nama', 'nim', 'createdAt']; 
+const FIELD_BOLEH_DIPILIH = ['kodePelatihan', 'judul', 'kuota', 'bidang', 'jadwal', 'lembagaId', 'createdAt'];
 
 // Mengubah bilangan dari query string menjadi bilangan bulat yang aman
 function angkaAman(nilai, bawaan, min, maks) {
@@ -16,8 +16,8 @@ function angkaAman(nilai, bawaan, min, maks) {
 
 exports.create = async (req, res) => {
   try {
-    const mahasiswa = await Mahasiswa.create(req.body);
-    res.status(201).json(mahasiswa);
+    const pelatihan = await Pelatihan.create(req.body);
+    res.status(201).json(pelatihan);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -25,13 +25,8 @@ exports.create = async (req, res) => {
 
 exports.getAll = async (req, res) => {
   const filter = {};
-  if(req.query.kota){
-    filter['alamat.kota'] = String(req.query.kota);
-  }
-  if (req.query.prodi) {
-    const prodi = await Prodi.findOne({ kode: String(req.query.prodi).toUpperCase() });
-    // Kode prodi tidak dikenal -> hasil kosong ($in: [] tidak cocok dengan apa pun)
-    filter.prodiId = prodi ? prodi._id : { $in: [] };
+  if(req.query.bidang){ //contoh filter pelatihan?bidang = bisnis 
+    filter['bidang'] = String(req.query.bidang); //bukan subdocument 
   }
 
   const page = angkaAman(req.query.page, 1, 1, Number.MAX_SAFE_INTEGER);
@@ -55,7 +50,7 @@ exports.getAll = async (req, res) => {
     select = fields.join(' ');
   }
 
-  const query = Mahasiswa.find(filter)
+  const query = Pelatihan.find(filter)
     .select(select)
     .sort({ [sortField]: arah, _id: 1 })
     .skip((page - 1) * limit)
@@ -63,23 +58,23 @@ exports.getAll = async (req, res) => {
 
   // populate() otomatis menambahkan prodiId ke hasil, jadi hanya dipanggil
   // bila prodiId memang diminta (atau bila tidak ada pemilihan field)
-  if (!select || select.split(' ').includes('prodiId')) {
-    query.populate('prodiId', 'kode nama');
+  if (!select || select.split(' ').includes('lembagaId')) {
+    query.populate('lembagaId', 'kode nama');
   }
 
-  const [data, total] = await Promise.all([query, Mahasiswa.countDocuments(filter)]);
+  const [data, total] = await Promise.all([query, Pelatihan.countDocuments(filter)]);
 
   res.json({ data, page, limit, total, totalPages: Math.ceil(total / limit) });
 };
 
 exports.getById = async (req, res) => {
-  const data = await Mahasiswa.findById(req.params.id).populate('prodiId');
+  const data = await Pelatihan.findById(req.params.id).populate('lembagaId');
   if (!data) throw errorHttp(404, 'Data tidak ditemukan');
   res.json(data);
 };
 
 exports.update = async (req, res) => {
-  const data = await Mahasiswa.findByIdAndUpdate(
+  const data = await Pelatihan.findByIdAndUpdate(
     req.params.id,
     req.body,
     { returnDocument: 'after', runValidators: true }
@@ -89,7 +84,7 @@ exports.update = async (req, res) => {
 };
 
 exports.remove = async (req, res) => {
-  const data = await Mahasiswa.findByIdAndDelete(req.params.id);
+  const data = await Pelatihan.findByIdAndDelete(req.params.id);
   if (!data) throw errorHttp(404, 'Data tidak ditemukan');
   res.status(204).send();
 };

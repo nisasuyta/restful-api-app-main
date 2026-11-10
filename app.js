@@ -6,7 +6,7 @@ const cors = require('cors');
 const logger = require('./middlewares/logger');
 const { notFoundHandler, errorHandler } = require('./middlewares/errorHandler');
 
-// const mahasiswaRoutes = require('./routes/mahasiswaRoutes');
+const PelatihanRoutes = require('./routes/PelatihanRoutes');
 // const fakultasRoutes = require('./routes/fakultasRoutes');
 const LembagaRoutes = require('./routes/LembagaRoutes');
 
@@ -27,7 +27,7 @@ app.get('/', (req, res) => {
 });
 
 // ---------- Route per modul ----------
-// app.use('/mahasiswa', mahasiswaRoutes);
+app.use('/pelatihan', PelatihanRoutes);
 // app.use('/fakultas', fakultasRoutes);
 app.use('/Lembaga', LembagaRoutes);
 
