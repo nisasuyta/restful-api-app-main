@@ -10,10 +10,7 @@ const PelatihanSchema = new mongoose.Schema({
   judul: { type: String, required: [true, 'judul wajib diisi'], trim: true },
   kuota: { type: Number, required: [true, 'kuota wajib diisi'], min: 1 },
   bidang: { type: String, required: [true, 'bidang wajib diisi'], trim: true },
-  jadwal: {
-    mulai: { type: String },
-    selesai: { type: String }
-  },
+  jadwal: jadwalSchema,
   lembagaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Lembaga', required: true },
   createdAt: { type: Date, default: Date.now }
 });

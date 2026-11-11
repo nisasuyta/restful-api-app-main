@@ -27,7 +27,7 @@ app.get('/', (req, res) => {
 });
 
 // ---------- Route per modul ----------
-app.use('/pelatihan', PelatihanRoutes);
+app.use('/Pelatihan', PelatihanRoutes);
 // app.use('/fakultas', fakultasRoutes);
 app.use('/Lembaga', LembagaRoutes);
 
@@ -38,6 +38,7 @@ app.use(errorHandler);
 // app.listen(PORT, () => {
 //   console.log(`Server berjalan di http://localhost:${PORT}`);
 // });
+
 
 mongoose.connect(process.env.DB_URI)
   .then(() => {

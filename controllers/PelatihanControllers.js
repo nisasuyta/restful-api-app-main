@@ -25,8 +25,13 @@ exports.create = async (req, res) => {
 
 exports.getAll = async (req, res) => {
   const filter = {};
-  if(req.query.bidang){ //contoh filter pelatihan?bidang = bisnis 
-    filter['bidang'] = String(req.query.bidang); //bukan subdocument 
+  if(req.query.selesai){
+    filter['jadwal.selesai'] = String(req.query.selesai);
+  }
+  if (req.query.lembaga) {
+    const lembaga = await Lembaga.findOne({ kode: String(req.query.lembaga).toUpperCase() });
+    // Kode prodi tidak dikenal -> hasil kosong ($in: [] tidak cocok dengan apa pun)
+    filter.koleksiId = koleksi ? koleksi._id : { $in: [] };
   }
 
   const page = angkaAman(req.query.page, 1, 1, Number.MAX_SAFE_INTEGER);
